@@ -3,7 +3,6 @@ class CabHistory < ApplicationRecord
 
   validates :cab_id, presence: true
   validates_associated :cab
-  validates :start_time, presence: true
 
   belongs_to :cab
 end
