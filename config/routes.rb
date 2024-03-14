@@ -7,4 +7,5 @@ Rails.application.routes.draw do
   post 'create_client', to: 'users#create_client'
 
   resources :cities, only: [:create]
+  resources :cabs, only: [:create]
 end
