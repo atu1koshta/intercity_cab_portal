@@ -38,7 +38,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_14_081920) do
   end
 
   create_table "cabs", force: :cascade do |t|
-    t.integer "city_id", null: false
+    t.integer "city_id"
     t.integer "state", default: 0, null: false
     t.datetime "last_idle_start_time"
     t.bigint "total_idle_time", default: 0, null: false

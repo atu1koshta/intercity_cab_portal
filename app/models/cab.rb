@@ -3,16 +3,22 @@ class Cab < ApplicationRecord
 
   before_validation :set_last_idle_start_time_if_idle
 
-  validates :city_id, presence: true
-  validates_associated :city
-  validates :state, presence: true
   validates :total_idle_time, presence: true
+  validate :city_id_presence_when_idle
 
-  belongs_to :city
+  belongs_to :city, optional: true
 
   private
 
   def set_last_idle_start_time_if_idle
     self.last_idle_start_time = Time.current if state == 'IDLE'
+  end
+
+  def city_id_presence_when_idle
+    if state == 'IDLE' && city_id.nil?
+      errors.add(:city_id, "can't be blank when state is IDLE")
+    elsif state == 'ON_TRIP' && city_id.present?
+      errors.add(:city_id, 'must be blank when state is ON_TRIP')
+    end
   end
 end
