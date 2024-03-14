@@ -41,7 +41,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_14_081920) do
     t.integer "city_id", null: false
     t.integer "state", default: 0, null: false
     t.datetime "last_idle_start_time"
-    t.bigint "total_idle_time"
+    t.bigint "total_idle_time", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["city_id"], name: "index_cabs_on_city_id"
