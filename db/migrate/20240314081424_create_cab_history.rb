@@ -3,8 +3,8 @@ class CreateCabHistory < ActiveRecord::Migration[7.0]
     create_table :cab_histories do |t|
       t.references :cab, foreign_key: { to_table: :cabs }
       t.integer :state, null: false, default: 0
-      t.datetime :start_time, null: false
-      t.datetime :end_time, null: false
+      t.datetime :start_time, null: false, default: -> { 'CURRENT_TIMESTAMP' }
+      t.datetime :end_time
 
       t.timestamps
     end

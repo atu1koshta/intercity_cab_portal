@@ -29,8 +29,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_14_081920) do
   create_table "cab_histories", force: :cascade do |t|
     t.integer "cab_id"
     t.integer "state", default: 0, null: false
-    t.datetime "start_time", null: false
-    t.datetime "end_time", null: false
+    t.datetime "start_time", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "end_time"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["cab_id"], name: "index_cab_histories_on_cab_id"
