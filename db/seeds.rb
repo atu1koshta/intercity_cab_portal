@@ -7,3 +7,4 @@
 #   Character.create(name: "Luke", movie: movies.first)
 
 require_relative 'seeds/users'
+# require_relative 'seeds/cities'
