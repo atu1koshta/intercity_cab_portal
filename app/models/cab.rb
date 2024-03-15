@@ -7,7 +7,7 @@ class Cab < ApplicationRecord
   validate :city_id_presence_when_idle
 
   belongs_to :city, optional: true
-  has_many :cab_histories
+  has_many :cab_histories, dependent: :destroy
 
   private
 
