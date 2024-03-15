@@ -44,7 +44,7 @@ class CabsController < ApplicationController
                success: :ok
       else
         update_params = { state: 'ON_TRIP' }
-        response = handle_update(cab, update_params, booking_source_id: city_id)
+        response = handle_update_and_booking(cab, update_params, booking_source_id: city_id)
 
         if response[:json][:success]
           render json: { success: true, message: 'Cab booked successfully', data: { cab_id: cab.id } }, status: :ok
@@ -82,24 +82,24 @@ class CabsController < ApplicationController
       if cab.state == update_params[:state] && cab.city_id == update_params[:city_id]
         { json: { success: false, message: 'Cab already in given state and city!', data: nil }, status: :ok }
       else
-        handle_update(cab, update_params)
+        handle_update_and_booking(cab, update_params)
       end
     elsif update_params.key?(:city_id)
       if cab.city_id == update_params[:city_id]
         { json: { success: false, message: 'Cab already in given city!', data: nil }, status: :ok }
       else
-        handle_update(cab, update_params, only_city_update: true)
+        handle_update_and_booking(cab, update_params, only_city_update: true)
       end
     elsif update_params.key?(:state)
       if cab.state == update_params[:state]
         { json: { success: false, message: 'Cab already in given state!', data: nil }, status: :ok }
       else
-        handle_update(cab, update_params)
+        handle_update_and_booking(cab, update_params)
       end
     end
   end
 
-  def handle_update(cab, update_params, booking_source_id: nil, only_city_update: false)
+  def handle_update_and_booking(cab, update_params, booking_source_id: nil, only_city_update: false)
     now = Time.now
     last_cab_history = cab.cab_histories.last
 
