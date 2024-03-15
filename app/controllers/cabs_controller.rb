@@ -58,9 +58,6 @@ class CabsController < ApplicationController
 
   def insights
     cab_id = params[:id]
-    puts "*******************"
-    puts cab_id
-    puts "*******************"
     start_datetime = parse_datetime(params[:start_datetime])
     end_datetime = parse_datetime(params[:end_datetime])
 
