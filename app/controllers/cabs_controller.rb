@@ -44,7 +44,7 @@ class CabsController < ApplicationController
                success: :ok
       else
         update_params = { state: 'ON_TRIP' }
-        response = handle_update(cab, update_params)
+        response = handle_update(cab, update_params, booking_source_id: city_id)
 
         if response[:json][:success]
           render json: { success: true, message: 'Cab booked successfully', data: { cab_id: cab.id } }, status: :ok
@@ -99,7 +99,7 @@ class CabsController < ApplicationController
     end
   end
 
-  def handle_update(cab, update_params, only_city_update: false)
+  def handle_update(cab, update_params, booking_source_id: nil, only_city_update: false)
     now = Time.now
     last_cab_history = cab.cab_histories.last
 
@@ -111,7 +111,7 @@ class CabsController < ApplicationController
 
         unless only_city_update
           last_cab_history.update!(end_time: now)
-          cab.cab_histories.create!(state: update_params[:state], start_time: now)
+          cab.cab_histories.create!(cab_history_params(update_cab_params, now, booking_source_id))
         end
       end
       { json: { success: true, message: 'Cab updated successfully', data: nil }, status: :ok }
@@ -122,5 +122,12 @@ class CabsController < ApplicationController
       { json: { success: false, message: 'Foreign key constraint violation.', data: { errors: e.message } },
         status: :unprocessable_entity }
     end
+  end
+
+  def cab_history_params(update_params, now, booking_source_id)
+    cab_history_params = { state: update_params[:state], start_time: now }
+    cab_history_params.merge!({ booking_source_id:, state: 'ON_TRIP' }) if booking_source_id.present?
+
+    cab_history_params
   end
 end

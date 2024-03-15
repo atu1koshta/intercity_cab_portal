@@ -5,4 +5,5 @@ class CabHistory < ApplicationRecord
   validates_associated :cab
 
   belongs_to :cab
+  belongs_to :booking_source, class_name: 'City', optional: true
 end

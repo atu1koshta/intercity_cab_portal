@@ -10,29 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_03_14_081920) do
-  create_table "bookings", force: :cascade do |t|
-    t.integer "customer_id", null: false
-    t.integer "start_city_id", null: false
-    t.integer "assigned_cab_id", null: false
-    t.datetime "booking_time", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.datetime "trip_start_at", null: false
-    t.datetime "trip_end_at", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index "\"assigned_cab\"", name: "index_bookings_on_assigned_cab"
-    t.index ["assigned_cab_id"], name: "index_bookings_on_assigned_cab_id"
-    t.index ["customer_id"], name: "index_bookings_on_customer_id"
-    t.index ["start_city_id"], name: "index_bookings_on_start_city_id"
-  end
-
+ActiveRecord::Schema[7.0].define(version: 2024_03_14_081424) do
   create_table "cab_histories", force: :cascade do |t|
     t.integer "cab_id", null: false
+    t.integer "booking_source_id"
     t.integer "state", default: 0, null: false
     t.datetime "start_time", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "end_time"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["booking_source_id"], name: "index_cab_histories_on_booking_source_id"
     t.index ["cab_id"], name: "index_cab_histories_on_cab_id"
     t.index ["state"], name: "index_cab_histories_on_state"
   end
@@ -63,9 +50,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_14_081920) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
-  add_foreign_key "bookings", "cabs", column: "assigned_cab_id"
-  add_foreign_key "bookings", "cities", column: "start_city_id"
-  add_foreign_key "bookings", "users", column: "customer_id"
   add_foreign_key "cab_histories", "cabs"
+  add_foreign_key "cab_histories", "cities", column: "booking_source_id"
   add_foreign_key "cabs", "cities"
 end
