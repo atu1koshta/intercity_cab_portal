@@ -25,8 +25,34 @@ class CabsController < ApplicationController
     if cab.nil?
       render json: { success: false, message: 'Invalid cab id provided', data: nil }, status: :not_found
     else
-      response = update_helper(cab)
+      response = update_helper(cab, update_cab_params)
       render response
+    end
+  end
+
+  def book
+    city_id = book_params[:city_id]
+
+    if city_id.nil? || City.find_by(id: city_id).nil?
+      render json: { success: false, message: 'City not registered. Cab service unavailable in given city', data: nil },
+             status: :not_found
+    else
+      cab = Cab.available_cab(city_id)
+
+      if cab.nil?
+        render json: { success: false, message: 'No cabs available at the moment. Please try later.', data: nil },
+               success: :ok
+      else
+        update_params = { state: 'ON_TRIP' }
+        response = handle_update(cab, update_params)
+
+        if response[:json][:success]
+          render json: { success: true, message: 'Cab booked successfully', data: { cab_id: cab.id } }, status: :ok
+        else
+          render json: { success: false, message: 'Something went wrong while booking cab. Please try again.', data: nil },
+                 status: :internal_server_error
+        end
+      end
     end
   end
 
@@ -40,6 +66,10 @@ class CabsController < ApplicationController
     params.require(:cab).permit(:city_id, :state)
   end
 
+  def book_params
+    params.permit(:city_id)
+  end
+
   def cab_object
     id = cab_params[:id]
     return if id.present? && Cab.exists?(id:)
@@ -47,45 +77,41 @@ class CabsController < ApplicationController
     Cab.new(cab_params)
   end
 
-  def update_helper(cab)
-    if update_cab_params.key?(:state) && update_cab_params.key?(:city_id)
-      if cab.state == update_cab_params[:state] && cab.city_id == update_cab_params[:city_id]
-        handle_total_idle_time_update(cab)
+  def update_helper(cab, update_params)
+    if update_params.key?(:state) && update_params.key?(:city_id)
+      if cab.state == update_params[:state] && cab.city_id == update_params[:city_id]
         { json: { success: false, message: 'Cab already in given state and city!', data: nil }, status: :ok }
       else
-        handle_update(cab)
+        handle_update(cab, update_params)
       end
-    elsif update_cab_params.key?(:city_id)
-      if cab.city_id == update_cab_params[:city_id]
-        handle_total_idle_time_update(cab)
+    elsif update_params.key?(:city_id)
+      if cab.city_id == update_params[:city_id]
         { json: { success: false, message: 'Cab already in given city!', data: nil }, status: :ok }
       else
-        handle_update(cab, only_city_update: true)
+        handle_update(cab, update_params, only_city_update: true)
       end
-    elsif update_cab_params.key?(:state)
-      if cab.state == update_cab_params[:state]
-        handle_total_idle_time_update(cab)
+    elsif update_params.key?(:state)
+      if cab.state == update_params[:state]
         { json: { success: false, message: 'Cab already in given state!', data: nil }, status: :ok }
       else
-        handle_update(cab)
+        handle_update(cab, update_params)
       end
     end
   end
 
-  def handle_update(cab, only_city_update: false)
+  def handle_update(cab, update_params, only_city_update: false)
     now = Time.now
     last_cab_history = cab.cab_histories.last
-    idle_time = last_cab_history.state == 'IDLE' ? now - last_cab_history.start_time : 0
 
-    new_params = update_cab_params[:state] == 'ON_TRIP' && !update_cab_params.key?(:city_id) ? update_cab_params.merge({ city_id: nil }) : update_cab_params
+    update_params.merge!({ city_id: nil }) if update_params[:state] == 'ON_TRIP' && !update_params.key?(:city_id)
 
     begin
       ActiveRecord::Base.transaction do
-        cab.update!(new_params.merge({ total_idle_time: cab.total_idle_time + idle_time }))
+        cab.update!(update_params)
 
         unless only_city_update
           last_cab_history.update!(end_time: now)
-          cab.cab_histories.create!(state: new_params[:state], start_time: now)
+          cab.cab_histories.create!(state: update_params[:state], start_time: now)
         end
       end
       { json: { success: true, message: 'Cab updated successfully', data: nil }, status: :ok }
@@ -96,14 +122,5 @@ class CabsController < ApplicationController
       { json: { success: false, message: 'Foreign key constraint violation.', data: { errors: e.message } },
         status: :unprocessable_entity }
     end
-  end
-
-  def handle_total_idle_time_update(cab)
-    now = Time.now
-    idle_time = cab.state == 'IDLE' ? now - cab.last_idle_start_time : 0
-
-    return unless idle_time
-
-    cab.update(total_idle_time: cab.total_idle_time + idle_time)
   end
 end
