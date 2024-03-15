@@ -21,6 +21,25 @@ class Cab < ApplicationRecord
   belongs_to :city, optional: true
   has_many :cab_histories, dependent: :destroy
 
+  def total_idle_time_within_range(start_datetime, end_datetime)
+    idle_periods = cab_histories.where(state: 'IDLE').pluck(:start_time, :end_time)
+
+    total_idle_time = 0
+    idle_periods.each do |idle_start, idle_end|
+      idle_end ||= Time.current
+      intersection_start = [idle_start, start_datetime].max
+      intersection_end = [idle_end, end_datetime].min
+
+      puts "****************"
+      puts idle_start
+      puts start_datetime
+      puts "****************"
+      total_idle_time += intersection_end - intersection_start if intersection_start < intersection_end
+    end
+
+    total_idle_time
+  end
+
   # Class methods
 
   def self.available_cab(city_id)

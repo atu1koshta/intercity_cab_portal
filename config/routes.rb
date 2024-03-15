@@ -9,5 +9,6 @@ Rails.application.routes.draw do
   resources :cities, only: [:create]
   resources :cabs, only: %i[create update] do
     post 'book', on: :collection
+    get 'insights', on: :member
   end
 end

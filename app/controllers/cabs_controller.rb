@@ -56,6 +56,27 @@ class CabsController < ApplicationController
     end
   end
 
+  def insights
+    cab_id = params[:id]
+    puts "*******************"
+    puts cab_id
+    puts "*******************"
+    start_datetime = parse_datetime(params[:start_datetime])
+    end_datetime = parse_datetime(params[:end_datetime])
+
+    cab = Cab.find_by(id: cab_id)
+    if cab.nil?
+      render json: { status: false, message: 'Invalid cab id provided', data: nil }, status: :not_found
+    elsif start_datetime.nil? || end_datetime.nil?
+      render json: { status: false, message: 'Invalid datetime format. Please provide datetime in YYYY-MM-DD hh:mm:ss format.', data: nil },
+             status: :unprocessable_entity
+    else
+      response = cab.total_idle_time_within_range(start_datetime, end_datetime)
+      render json: { success: true, message: 'Insights created successfully', data: { total_idle_time_within_range: response } },
+             status: :ok
+    end
+  end
+
   private
 
   def cab_params
@@ -68,6 +89,14 @@ class CabsController < ApplicationController
 
   def book_params
     params.permit(:city_id)
+  end
+
+  def parse_datetime(datetime_str)
+    # Use DateTime.strptime to parse the datetime string with the given format
+    DateTime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+  rescue ArgumentError
+    # Handle parsing errors, such as invalid datetime format
+    nil
   end
 
   def cab_object
@@ -100,7 +129,7 @@ class CabsController < ApplicationController
   end
 
   def handle_update_and_booking(cab, update_params, booking_source_id: nil, only_city_update: false)
-    now = Time.now
+    now = Time.current
     last_cab_history = cab.cab_histories.last
 
     update_params.merge!({ city_id: nil }) if update_params[:state] == 'ON_TRIP' && !update_params.key?(:city_id)
