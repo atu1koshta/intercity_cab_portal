@@ -1,4 +1,6 @@
 class CabsController < ApplicationController
+  include MainHelper
+
   def create
     cab = cab_object
 
@@ -58,8 +60,8 @@ class CabsController < ApplicationController
 
   def insights
     cab_id = params[:id]
-    start_datetime = parse_datetime(params[:start_datetime])
-    end_datetime = parse_datetime(params[:end_datetime])
+    start_datetime = datetime_in_utc(params[:start_datetime])
+    end_datetime = datetime_in_utc(params[:end_datetime])
 
     cab = Cab.find_by(id: cab_id)
     if cab.nil?
@@ -69,7 +71,7 @@ class CabsController < ApplicationController
              status: :unprocessable_entity
     else
       response = cab.total_idle_time_within_range(start_datetime, end_datetime)
-      render json: { success: true, message: 'Insights created successfully', data: { total_idle_time_within_range: response } },
+      render json: { success: true, message: 'Insights created successfully', data: { total_idle_time_within_range: "#{response.round(2)}s" } },
              status: :ok
     end
   end

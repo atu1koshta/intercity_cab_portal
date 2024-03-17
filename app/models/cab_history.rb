@@ -19,4 +19,12 @@ class CabHistory < ApplicationRecord
 
   belongs_to :cab
   belongs_to :booking_source, class_name: 'City', optional: true
+
+  before_create :set_start_time
+
+  private
+
+  def set_start_time
+    self.start_time = Time.current
+  end
 end

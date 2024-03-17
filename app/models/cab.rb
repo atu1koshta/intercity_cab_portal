@@ -24,16 +24,15 @@ class Cab < ApplicationRecord
   def total_idle_time_within_range(start_datetime, end_datetime)
     idle_periods = cab_histories.where(state: 'IDLE').pluck(:start_time, :end_time)
 
+    puts "start_datetime: #{start_datetime}, end_datetime: #{end_datetime}"
+
     total_idle_time = 0
     idle_periods.each do |idle_start, idle_end|
-      idle_end ||= Time.current
+      idle_end ||= DateTime.now.utc
+      puts "idle_start: #{idle_start}, idle_end: #{idle_end}"
       intersection_start = [idle_start, start_datetime].max
       intersection_end = [idle_end, end_datetime].min
 
-      puts "****************"
-      puts idle_start
-      puts start_datetime
-      puts "****************"
       total_idle_time += intersection_end - intersection_start if intersection_start < intersection_end
     end
 

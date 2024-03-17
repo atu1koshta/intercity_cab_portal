@@ -15,7 +15,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_14_081424) do
     t.integer "cab_id", null: false
     t.integer "booking_source_id"
     t.integer "state", default: 0, null: false
-    t.datetime "start_time", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "start_time", null: false
     t.datetime "end_time"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
