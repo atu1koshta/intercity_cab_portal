@@ -1,24 +1,65 @@
-# README
+# City Registration API
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This API allows users to register a city with optional parameters.
 
-Things you may want to cover:
+## Register a City
 
-* Ruby version
+### Endpoint
 
-* System dependencies
+`POST /cities`
 
-* Configuration
+### Request Parameters
 
-* Database creation
+- `city`: (optional) An object containing the city details.
+  - `id`: (optional) The ID of the city.
+  - `name`: (optional) The name of the city.
 
-* Database initialization
+### Request Body
 
-* How to run the test suite
+The request body can be empty for creating a city with a random ID or can contain the city object with ID and name.
 
-* Services (job queues, cache servers, search engines, etc.)
+```json
+{
+  "city": {
+    "id": 23340,
+    "name": "City Name"
+  }
+}
 
-* Deployment instructions
 
-* ...
+
+# Cab Registration API
+
+This API allows users to register a cab in a city with optional parameters.
+
+## Register a Cab
+
+### Endpoint
+
+`POST /cabs`
+
+### Request Parameters
+
+- `cab`: An object containing the cab details.
+  - `city_id`: The ID of the city where the cab is being registered.
+  - `state`: The state of the cab. Default is "IDLE".
+
+### Request Body
+
+To register a cab in a city (must be registered) with default state as "IDLE":
+
+```json
+{
+  "cab": {
+    "city_id": 23340
+  }
+}
+
+To register a cab with default state as "ON_TRIP":
+
+```json
+{
+  "cab": {
+    "state": "ON_TRIP"
+  }
+}
