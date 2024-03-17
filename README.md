@@ -64,3 +64,42 @@ To register a cab with default state as "ON_TRIP":
     "state": "ON_TRIP"
   }
 }
+```
+
+# Cab Management API
+
+This API facilitates managing the state of cabs.
+
+## Update Cab State
+
+### Endpoint
+
+`PUT /cabs/:id`
+
+### Path Parameters
+
+- `id`: The ID of the cab to be updated.
+
+### Request Body
+
+To change the cab's state from 'ON_TRIP' to 'IDLE', a valid `city_id` must be provided:
+
+```json
+{
+  "cab": {
+    "state": "IDLE",
+    "city_id": 23339
+  }
+}
+```
+
+To change the cab's state from 'IDLE' to 'ON_TRIP', only state param is required:
+
+```json
+{
+  "cab": {
+    "state": "ON_TRIP"
+  }
+}
+```
+
