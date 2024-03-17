@@ -103,3 +103,23 @@ To change the cab's state from 'IDLE' to 'ON_TRIP', only state param is required
 }
 ```
 
+# Cab Booking API
+
+This API enables users to book a cab in a specified city.
+
+## Book a Cab
+
+### Endpoint
+
+`POST /cabs/book`
+
+### Request Body
+
+To book a cab, provide the `city_id` where the cab should be booked. Ensure that the `city_id` is valid.
+
+```json
+{
+  "city_id": 23340
+}
+```
+
