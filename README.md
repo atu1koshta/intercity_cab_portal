@@ -25,7 +25,7 @@ The request body can be empty for creating a city with a random ID or can contai
     "name": "City Name"
   }
 }
-
+```
 
 
 # Cab Registration API
