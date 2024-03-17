@@ -54,6 +54,7 @@ To register a cab in a city (must be registered) with default state as "IDLE":
     "city_id": 23340
   }
 }
+```
 
 To register a cab with default state as "ON_TRIP":
 
