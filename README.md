@@ -123,3 +123,21 @@ To book a cab, provide the `city_id` where the cab should be booked. Ensure that
 }
 ```
 
+# Cab Insight API
+
+This API provides insights into the total idle time of a cab within a given date-time range.
+
+## Get Cab Insights
+
+### Endpoint
+
+`GET /cabs/:id/insights`
+
+### Path Parameters
+
+- `id`: The ID of the cab.
+
+### Query Parameters
+
+- `state_datetime`: Datetime in YYYY-MM-DD hh:mm:ss format (IST), indicating the start of the date-time range.
+- `end_datetime`: Datetime in YYYY-MM-DD hh:mm:ss format (IST), indicating the end of the date-time range.
